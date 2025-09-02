@@ -10,6 +10,7 @@ from canonicalwebteam.store_api.dashboard import Dashboard
 # Local
 from webapp.decorators import login_required, exchange_required
 from webapp.helpers import api_session
+from webapp.flash_messages import flash_message
 
 
 dashboard = Dashboard(api_session)
@@ -65,6 +66,6 @@ def post_manage_members(store_id):
                 res["msg"] = code
             else:
                 for msg in msgs:
-                    flask.flash(msg, "negative")
+                    flash_message(msg, "negative")
 
     return jsonify(res)

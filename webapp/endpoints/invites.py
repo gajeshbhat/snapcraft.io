@@ -10,6 +10,7 @@ from flask.json import jsonify
 # Local
 from webapp.decorators import login_required, exchange_required
 from webapp.helpers import api_session
+from webapp.flash_messages import flash_message
 
 
 dashboard = Dashboard(api_session)
@@ -49,7 +50,7 @@ def update_invite_status(store_id):
         msgs = list(dict.fromkeys(msgs))
 
         for msg in msgs:
-            flask.flash(msg, "negative")
+            flash_message(msg, "negative")
 
     return jsonify(res)
 
@@ -74,6 +75,6 @@ def post_invite_members(store_id):
         msgs = list(dict.fromkeys(msgs))
 
         for msg in msgs:
-            flask.flash(msg, "negative")
+            flash_message(msg, "negative")
 
     return jsonify(res)

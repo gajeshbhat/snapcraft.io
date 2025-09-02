@@ -5,6 +5,7 @@ from webapp.decorators import login_required
 from webapp.api.requests import Session
 from urllib.parse import urlencode
 from werkzeug.exceptions import BadRequest
+from webapp.flash_messages import flash_message
 
 
 oauth = flask.Blueprint(
@@ -51,7 +52,7 @@ def github_login_verify():
 
     # Avoid CSRF attacks
     if state != flask.session["csrf_token"]:
-        flask.flash("Invalid request", "negative")
+        flash_message("Invalid request", "negative")
         return flask.redirect(url_to_redirect)
 
     data = {

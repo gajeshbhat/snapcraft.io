@@ -89,6 +89,22 @@
       {% endif %}
     {% endblock %}
 
+    <!-- Flash messages -->
+    {% if has_custom_flash_messages() %}
+      <div class="p-notification-center">
+        {% for category, message in get_custom_flash_messages(with_categories=true) %}
+          <div class="p-notification p-notification--{{ 'positive' if category == 'positive' else 'negative' if category == 'negative' else 'information' if category == 'information' else 'caution' if category == 'warning' else 'information' }}" role="alert" aria-live="polite">
+            <div class="p-notification__content">
+              <p class="p-notification__message">{{ message }}</p>
+              <button class="p-notification__close" aria-label="Close notification" onclick="this.parentElement.parentElement.remove()">
+                Close
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
 
     {% block footer %}

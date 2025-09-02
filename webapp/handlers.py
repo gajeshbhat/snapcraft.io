@@ -10,6 +10,7 @@ from flask import render_template, request
 import prometheus_client
 import user_agents
 import webapp.template_utils as template_utils
+import webapp.flash_messages as flash_messages
 from canonicalwebteam import image_template
 from webapp import authentication
 import webapp.helpers as helpers
@@ -196,6 +197,9 @@ def snapcraft_utility_processor():
         "vite_dev_tools": template_utils.vite_dev_tools,
         "format_number": template_utils.format_number,
         "format_display_name": template_utils.format_display_name,
+        # Custom flash message functions
+        "get_custom_flash_messages": flash_messages.get_all_flash_messages,
+        "has_custom_flash_messages": flash_messages.has_flash_messages,
         "display_name": template_utils.display_name,
         "install_snippet": template_utils.install_snippet,
         "format_date": template_utils.format_date,

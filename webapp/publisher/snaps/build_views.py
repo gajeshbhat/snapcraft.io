@@ -15,6 +15,7 @@ from webapp.api.github import GitHub, InvalidYAML
 from webapp.decorators import login_required
 from webapp.extensions import csrf
 from webapp.publisher.snaps.builds import map_build_and_upload_states
+from webapp.flash_messages import flash_message
 from werkzeug.exceptions import Unauthorized
 
 GITHUB_SNAPCRAFT_USER_TOKEN = os.getenv("GITHUB_SNAPCRAFT_USER_TOKEN")
@@ -227,7 +228,7 @@ def post_snap_builds(snap_name):
     account_snaps = dashboard.get_account_snaps(flask.session)
 
     if snap_name not in account_snaps:
-        flask.flash(
+        flash_message(
             "You do not have permissions to modify this Snap", "negative"
         )
         return flask.redirect(
@@ -241,7 +242,7 @@ def post_snap_builds(snap_name):
     owner, repo = flask.request.form.get("github_repository").split("/")
 
     if not github.check_permissions_over_repo(owner, repo):
-        flask.flash(
+        flash_message(
             "The repository doesn't exist or you don't have"
             " enough permissions",
             "negative",
@@ -253,7 +254,7 @@ def post_snap_builds(snap_name):
     )
 
     if not repo_validation["success"]:
-        flask.flash(repo_validation["error"]["message"], "negative")
+        flash_message(repo_validation["error"]["message"], "negative")
         return flask.redirect(redirect_url)
 
     lp_snap = launchpad.get_snap_by_store_name(details["snap_name"])
@@ -271,7 +272,7 @@ def post_snap_builds(snap_name):
                 raise e
 
         if repo_exist:
-            flask.flash(
+            flash_message(
                 "The specified repository is being used by another snap:"
                 f" {repo_exist['store_name']}",
                 "negative",
@@ -284,7 +285,7 @@ def post_snap_builds(snap_name):
 
         launchpad.create_snap(snap_name, git_url, macaroon)
 
-        flask.flash(
+        flash_message(
             "The GitHub repository was linked successfully.", "positive"
         )
 
@@ -299,10 +300,10 @@ def post_snap_builds(snap_name):
             if not hook:
                 github.create_hook(owner, repo, github_hook_url)
         except HTTPError:
-            flask.flash(
+            flash_message(
                 "The GitHub Webhook could not be created. "
                 "Please trigger a new build manually.",
-                "caution",
+                "warning",
             )
 
     elif lp_snap["git_repository_url"] != git_url:
@@ -423,7 +424,7 @@ def get_update_gh_webhooks(snap_name):
     lp_snap = launchpad.get_snap_by_store_name(details["snap_name"])
 
     if not lp_snap:
-        flask.flash(
+        flash_message(
             "This snap is not linked with a GitHub repository", "negative"
         )
 
@@ -473,12 +474,12 @@ def get_update_gh_webhooks(snap_name):
         # Create webhook in the repo
         github.create_hook(gh_owner, gh_repo, github_hook_url)
     except HTTPError:
-        flask.flash(
+        flash_message(
             "The GitHub Webhook could not be created. "
             "Please try again or check your permissions over the repository.",
-            "caution",
+            "warning",
         )
     else:
-        flask.flash("The webhook has been created successfully", "positive")
+        flash_message("The webhook has been created successfully", "positive")
 
     return flask.redirect(flask.url_for(".get_settings", snap_name=snap_name))
